@@ -1,0 +1,60 @@
+package com.example.yja38.book;
+
+import java.io.Serializable;
+
+/**
+ * Created by SH on 2017-11-08.
+ */
+
+public class BoardInfo implements Serializable {
+
+    String Board_no;
+    String Board_category_no;
+    String Board_name;
+    String Board_content;
+    String Board_writer_nickname;
+    String Board_date;
+    String Board_recommend_count;
+
+
+    public String getBoard_no() {
+        return Board_no;
+    }
+
+    public String getBoard_category_no() {
+        return Board_category_no;
+    }
+
+    public String getBoard_name() {
+        return Board_name;
+    }
+
+    public String getBoard_content() {
+        return Board_content;
+    }
+
+    public String getBoard_writer_nickname() {
+        return Board_writer_nickname;
+    }
+
+    public String getBoard_date() {
+        return Board_date;
+    }
+
+    public String getBoard_recommend_count() {
+        return Board_recommend_count;
+    }
+
+
+
+    public BoardInfo(String board_no, String board_category_no, String board_name, String board_content, String board_writer_nickname, String board_date, String board_recommend_count) {
+        Board_no =board_no;
+        Board_category_no = board_category_no;
+        Board_name = board_name;
+        Board_content = board_content;
+        Board_writer_nickname = board_writer_nickname;
+        Board_date = board_date;
+        Board_recommend_count = board_recommend_count;
+
+    }
+}

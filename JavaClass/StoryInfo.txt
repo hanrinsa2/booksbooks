@@ -1,0 +1,46 @@
+package com.example.yja38.book;
+
+/**
+ * Created by SH on 2017-10-28.
+ */
+
+public class StoryInfo {
+
+    String Story_no;
+    String Story_name;
+    String Story_content;
+    String Story_writer;
+    String Story_grade_avg;
+
+
+    public String getStory_no() {
+        return Story_no;
+    }
+
+    public String getStory_name() {
+        return Story_name;
+    }
+
+    public String getStory_content() {
+        return Story_content;
+    }
+
+    public String getStory_writer() {
+        return Story_writer;
+    }
+
+    public String getStory_grade_avg() {
+        return Story_grade_avg;
+    }
+
+
+
+    public StoryInfo(String story_no, String story_name, String story_content, String story_writer, String story_grade_avg) {
+        Story_no =story_no;
+        Story_name = story_name;
+        Story_content = story_content;
+        Story_writer = story_writer;
+        Story_grade_avg = story_grade_avg;
+
+    }
+}

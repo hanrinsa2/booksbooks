@@ -1,0 +1,46 @@
+package com.example.yja38.book;
+
+/**
+ * Created by SH on 2017-10-31.
+ */
+
+public class PoemInfo {
+
+    String Poem_no;
+    String Poem_name;
+    String Poem_content;
+    String Poem_writer;
+    String Poem_grade_avg;
+
+
+    public String getPoem_no() {
+        return Poem_no;
+    }
+
+    public String getPoem_name() {
+        return Poem_name;
+    }
+
+    public String getPoem_content() {
+        return Poem_content;
+    }
+
+    public String getPoem_writer() {
+        return Poem_writer;
+    }
+
+    public String getPoem_grade_avg() {
+        return Poem_grade_avg;
+    }
+
+
+
+    public PoemInfo(String poem_no, String poem_name, String poem_content, String poem_writer, String poem_grade_avg) {
+        Poem_no =poem_no;
+        Poem_name = poem_name;
+        Poem_content = poem_content;
+        Poem_writer = poem_writer;
+        Poem_grade_avg = poem_grade_avg;
+
+    }
+}

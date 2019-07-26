@@ -1,0 +1,33 @@
+package com.example.yja38.book;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by SH on 2017-11-27.
+ */
+
+public class InsertHeartRequest extends StringRequest {
+
+    final static private String URL="http://yja3806.dothome.co.kr/InsertHeart.php";
+    private Map<String,String> parameters;
+    public InsertHeartRequest(String Member_nickname,String Board_detail_no, Response.Listener<String>listener){
+        super(Request.Method.POST,URL,listener,null);
+        parameters=new HashMap<>();
+        parameters.put("Member_nickname",Member_nickname);
+        parameters.put("Board_detail_no",Board_detail_no);
+
+
+
+    }
+
+    @Override
+    public Map<String,String> getParams(){
+        return parameters;
+    }
+
+}

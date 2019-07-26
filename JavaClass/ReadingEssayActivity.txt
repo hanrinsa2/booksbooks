@@ -1,0 +1,369 @@
+package com.example.yja38.book;
+
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ReadingEssayActivity extends AppCompatActivity {
+
+    public static boolean EssayAdpCheck = false;
+    public static String EssayAdpText;
+
+    private static int rand;
+    private ListView listView;
+    private EssayInfoAdapter adapter;
+    private List<EssayInfo> essayInfoList;//이전에 받은 변수가잇음.
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                    return true;
+                case R.id.navigation_writing:
+                    new BackgroundTask().execute();
+                    return true;
+                case R.id.navigation_reading:
+                    Intent intent3 = new Intent(getApplicationContext(), SelectReadingActivity.class);
+                    startActivity(intent3);
+                    return true;
+            }
+            return false;
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_reading_essay);
+        Intent intent=getIntent();
+
+        listView=(ListView) findViewById(R.id.listView);//id가 listView인 곳과 연동할 변수 생성(위에서 이미 초기화)
+        essayInfoList=new ArrayList<EssayInfo>();//StoryInfo를 넣을 arraylist 생성함 (위에서 이미 초기화된 storyInfoList로 정함)
+        adapter=new EssayInfoAdapter(getApplicationContext(),essayInfoList);//지금 storyinfolist에 가지고 있는 값들을 adapter에 넣음
+        listView.setAdapter(adapter);//리스트뷰에 adapter값을 넣는다.
+
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+
+        Button essaypassbutton = (Button)findViewById(R.id.essaypassbutton);
+        if(SelectReadingActivity.wholecheck==false)
+        {
+            essaypassbutton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    new BackgroundTask3().execute();
+
+                }
+            });
+        }
+        else
+        {
+            essaypassbutton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {//클릭하면 동작시킴.
+                    rand=1+(int)(Math.random()*3);
+                    switch(rand)
+                    {
+                        case 1:
+                            new BackgroundTask1().execute();//아래 클래스 실행
+                            break;
+                        case 2:
+                            new BackgroundTask2().execute();//아래 클래스 실행
+                            break;
+                        case 3:
+                            new BackgroundTask3().execute();//아래 클래스 실행
+                            break;
+                    }
+
+                }
+            });
+        }
+
+
+        ////////////////////////////////각색부분/////////////////////////////////////////////
+        Button adpBtn = (Button)findViewById(R.id.EssayAdaptBtn);
+        adpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EssayAdpCheck = true;
+                Intent adpintent = new Intent(
+                        ReadingEssayActivity.this, // 현재 화면의 제어권자
+                        write.class); // 다음 넘어갈 클래스 지정
+                startActivity(adpintent);
+
+            }
+        });
+
+
+
+        /////////////////////////////////////////////////////////////////
+
+
+        /////////////////////////////////////////////////////////////////
+
+        try{
+            JSONObject jsonObject =new JSONObject(intent.getStringExtra("essayInfoList"));//이전 화면에서 넘겨받을 값을 저장.
+            JSONArray jsonArray=jsonObject.getJSONArray("response");//리스폰으로 받았엇음.
+            int count=0;
+            String Essay_no, Essay_name, Essay_content, Essay_writer, Essay_grade_avg;
+
+            while(count<jsonArray.length())//불러온 각각의 raw값들에 대해 안드로이드에서 지정한 변수로 초기화시킨다.
+            {
+                JSONObject object=jsonArray.getJSONObject(count);
+                Essay_no=object.getString("Essay_no");
+                Essay_name=object.getString("Essay_name");
+                Essay_content=object.getString("Essay_content");
+                Essay_writer=object.getString("Essay_writer");
+                Essay_grade_avg=object.getString("Essay_grade_avg");
+
+                EssayInfo essayInfo=new EssayInfo(Essay_no,Essay_name,Essay_content,Essay_writer,Essay_grade_avg);//storyInfo에 넣는다.
+                essayInfoList.add(essayInfo);//storyInfoList에 넣는다.
+                count++;
+
+                EssayAdpText = object.getString("Essay_content");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    /////////////////////////////////////////////////////
+    class BackgroundTask extends AsyncTask<Void, Void, String> {
+        String target;
+
+        @Override
+        protected void onPreExecute() {
+            target = "http://yja3806.dothome.co.kr/GetBoard_all.php";
+
+        }//php에 접속할 변수
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                URL url = new URL(target);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));//접속구문
+                String temp;
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((temp = bufferedReader.readLine()) != null)//temp에 읽은 데이터를 넣는다. null이 아닐때까지.
+                {
+                    stringBuilder.append(temp + "\n");//temp를 string빌더에 넣는다.
+
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();//받은 stringbuilder값 리턴
+
+
+            } catch (Exception e)//예외처리
+            {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        public void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        public void onPostExecute(String result) {
+            Intent intent = new Intent(getApplicationContext(), SelectWritingActivity.class);//화면전환
+            intent.putExtra("boardInfoList", result);//결과 값을 다음화면인 readingactivity에서 storyInfoList를 찾아 맵핑시켜 넣는다.
+            getApplicationContext().startActivity(intent);//현재 화면 실행
+
+        }
+    }
+
+
+
+
+
+    class BackgroundTask1 extends AsyncTask<Void, Void, String> {
+        String target;
+
+
+
+        @Override
+        protected void onPreExecute() {
+            target = "http://yja3806.dothome.co.kr/GetStory.php";
+
+        }//php에 접속할 변수
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                URL url = new URL(target);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));//접속구문
+                String temp;
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((temp = bufferedReader.readLine()) != null)//temp에 읽은 데이터를 넣는다. null이 아닐때까지.
+                {
+                    stringBuilder.append(temp + "\n");//temp를 string빌더에 넣는다.
+
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();//받은 stringbuilder값 리턴
+
+
+            } catch (Exception e)//예외처리
+            {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        public void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        public void onPostExecute(String result) {
+            Intent intent = new Intent(ReadingEssayActivity.this, ReadingStoryActivity.class);//화면전환
+            intent.putExtra("storyInfoList", result);//결과 값을 다음화면인 readingactivity에서 storyInfoList를 찾아 맵핑시켜 넣는다.
+            ReadingEssayActivity.this.startActivity(intent);//현재 화면 실행
+
+        }
+    }
+    //////////////////////////////////////////////////////////////////////////
+
+    class BackgroundTask2 extends AsyncTask<Void, Void, String>
+    {
+        String target;
+
+        @Override
+        protected void onPreExecute(){
+            target="http://yja3806.dothome.co.kr/GetPoem.php";
+        }//php에 접속할 변수
+
+        @Override
+        protected String doInBackground(Void... voids){
+            try{
+                URL url=new URL(target);
+                HttpURLConnection httpURLConnection=(HttpURLConnection) url.openConnection();
+                InputStream inputStream=httpURLConnection.getInputStream();
+                BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(inputStream));//접속구문
+                String temp;
+                StringBuilder stringBuilder=new StringBuilder();
+
+                while((temp=bufferedReader.readLine())!=null)//temp에 읽은 데이터를 넣는다. null이 아닐때까지.
+                {
+                    stringBuilder.append(temp+"\n");//temp를 string빌더에 넣는다.
+
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();//받은 stringbuilder값 리턴
+
+
+            }
+            catch(Exception e)//예외처리
+            {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        public void onProgressUpdate(Void... values)
+        {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        public void onPostExecute(String result){
+            Intent intent=new Intent(ReadingEssayActivity.this,ReadingPoemActivity.class);//화면전환
+            intent.putExtra("poemInfoList",result);//결과 값을 다음화면인 readingactivity에서 storyInfoList를 찾아 맵핑시켜 넣는다.
+            ReadingEssayActivity.this.startActivity(intent);//현재 화면 실행
+
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    class BackgroundTask3 extends AsyncTask<Void, Void, String> {
+        String target;
+
+        @Override
+        protected void onPreExecute() {
+            target = "http://yja3806.dothome.co.kr/GetEssay.php";
+        }//php에 접속할 변수
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                URL url = new URL(target);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));//접속구문
+                String temp;
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((temp = bufferedReader.readLine()) != null)//temp에 읽은 데이터를 넣는다. null이 아닐때까지.
+                {
+                    stringBuilder.append(temp + "\n");//temp를 string빌더에 넣는다.
+
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();//받은 stringbuilder값 리턴
+
+
+            } catch (Exception e)//예외처리
+            {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        public void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        public void onPostExecute(String result) {
+            Intent intent = new Intent(ReadingEssayActivity.this, ReadingEssayActivity.class);//화면전환
+            intent.putExtra("essayInfoList", result);//결과 값을 다음화면인 readingactivity에서 storyInfoList를 찾아 맵핑시켜 넣는다.
+            ReadingEssayActivity.this.startActivity(intent);//현재 화면 실행
+
+        }
+    }
+}

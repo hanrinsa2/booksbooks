@@ -1,0 +1,46 @@
+package com.example.yja38.book;
+
+/**
+ * Created by SH on 2017-11-01.
+ */
+
+public class EssayInfo {
+
+    String Essay_no;
+    String Essay_name;
+    String Essay_content;
+    String Essay_writer;
+    String Essay_grade_avg;
+
+
+    public String getEssay_no() {
+        return Essay_no;
+    }
+
+    public String getEssay_name() {
+        return Essay_name;
+    }
+
+    public String getEssay_content() {
+        return Essay_content;
+    }
+
+    public String getEssay_writer() {
+        return Essay_writer;
+    }
+
+    public String getEssay_grade_avg() {
+        return Essay_grade_avg;
+    }
+
+
+
+    public EssayInfo(String essay_no, String essay_name, String essay_content, String essay_writer, String essay_grade_avg) {
+        Essay_no =essay_no;
+        Essay_name = essay_name;
+        Essay_content = essay_content;
+        Essay_writer = essay_writer;
+        Essay_grade_avg = essay_grade_avg;
+
+    }
+}

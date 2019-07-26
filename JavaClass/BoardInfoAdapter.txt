@@ -1,0 +1,61 @@
+package com.example.yja38.book;
+
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import java.util.List;
+
+/**
+ * Created by SH on 2017-11-08.
+ */
+
+public class BoardInfoAdapter extends BaseAdapter {
+
+    private Context context;
+    private List<BoardInfo> boardInfoList;
+
+    public BoardInfoAdapter(Context context,List<BoardInfo> BoardInfoList)
+    {
+        this.context = context;
+        this.boardInfoList= BoardInfoList;
+
+    }
+
+    @Override
+    public int getCount() {
+        return boardInfoList.size();
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return boardInfoList.get(i);
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return i;
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {//각각의 id값들에 대해 특정 변수를 지정한 후 그 변수에 가져온 데이터를 집어넣는다. 그렇게 뷰를 세팅마무리한다.
+
+        View v=View.inflate(context,R.layout.board,null);
+        TextView Board_No=(TextView) v.findViewById(R.id.Board_No);
+        TextView Board_Name=(TextView) v.findViewById(R.id.Board_Name);
+        TextView Board_Writer_Nickname=(TextView) v.findViewById(R.id.Board_Writer_Nickname);
+        TextView Board_Date=(TextView) v.findViewById(R.id.Board_Date);
+        TextView Board_Recommend_Count=(TextView) v.findViewById(R.id.Board_Recommend_Count);
+
+        Board_No.setText(boardInfoList.get(i).getBoard_no());
+        Board_Name.setText(boardInfoList.get(i).getBoard_name());
+        Board_Writer_Nickname.setText(boardInfoList.get(i).getBoard_writer_nickname());
+        Board_Date.setText(boardInfoList.get(i).getBoard_date());
+        Board_Recommend_Count.setText(boardInfoList.get(i).getBoard_recommend_count());
+
+        v.setTag(boardInfoList.get(i).getBoard_no());//리스트의 식별자는 무엇인지 하는방법.
+        return v;
+    }
+}
